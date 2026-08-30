@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laser Pointer vs. Quantum Flashlight Simulator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    /* Custom Slider Aesthetics */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.9), 0 0 2px #fff;
+      margin-top: -7px;
+      border: 2px solid #ffffff;
+      transition: transform 0.1s ease, background-color 0.2s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      background: #1e293b;
+      border-radius: 9999px;
+      border: 1px solid #334155;
+    }
+
+    .laser-thumb::-webkit-slider-thumb {
+      background: #f43f5e !important;
+      box-shadow: 0 0 12px rgba(244, 63, 94, 0.9), 0 0 2px #fff !important;
+    }
+    .quantum-thumb::-webkit-slider-thumb {
+      background: #06b6d4 !important;
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.9), 0 0 2px #fff !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 via-amber-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+            Laser Pointer vs. Quantum Flashlight
+          </h1>
+          <p class="text-xs text-cyan-400 font-mono-code">Serial Search vs. Superposition Wave Interference</p>
+        </div>
+      </div>
+
+      <!-- Quick Preset Mode Buttons -->
+      <div class="flex items-center gap-2">
+        <button id="btn-mode-laser" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 transition flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+          Classical Laser
+        </button>
+        <button id="btn-mode-quantum" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 transition flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          Quantum Flashlight
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Controls (5 Cols) -->
+    <div class="lg:col-span-5 flex flex-col gap-5">
+
+      <!-- Primary Mode & Beam Spread Slider -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl backdrop-blur-sm">
+        
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+            </span>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">Search Paradigm Control</h2>
+          </div>
+          <span id="badge-mode" class="text-xs px-2.5 py-1 rounded-full font-mono-code font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+            Classical Laser (Serial)
+          </span>
+        </div>
+
+        <!-- Master Slider: Beam Mode (Laser -> Flashlight) -->
+        <div class="mb-5">
+          <div class="flex justify-between items-baseline mb-1.5">
+            <label for="slider-mode" class="text-xs font-semibold text-slate-300">
+              Beam Width & Superposition Spread
+            </label>
+            <span class="text-sm font-mono-code font-bold text-rose-400" id="val-mode">0% (Pinpoint Laser)</span>
+          </div>
+          <input type="range" id="slider-mode" min="0" max="100" step="1" value="0" class="w-full laser-thumb">
+          <div class="flex justify-between text-[10px] text-slate-500 mt-1.5 font-mono-code">
+            <span class="text-rose-400">🔴 Pinpoint Laser (1-by-1)</span>
+            <span class="text-cyan-400">🔵 Quantum Flashlight (All at once)</span>
+          </div>
+        </div>
+
+        <!-- Slider: Interference Tuning (Cancelling Wrong Answers) -->
+        <div class="mb-2">
+          <div class="flex justify-between items-baseline mb-1.5">
+            <label for="slider-interference" class="text-xs font-semibold text-slate-300">
+              Wave Interference Tuning (Destructive Filter)
+            </label>
+            <span class="text-sm font-mono-code font-bold text-amber-400" id="val-interference">10%</span>
+          </div>
+          <input type="range" id="slider-interference" min="0" max="100" step="1" value="10" class="w-full">
+          <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono-code">
+            <span>Raw Noise</span>
+            <span>Perfect Constructive Gain</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+            Tunes wrong molecular configurations to cancel out to darkness while amplifying the active drug binding site.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Live Comparison Card -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl backdrop-blur-sm">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Discovery Comparison Telemetry</h3>
+        
+        <div class="space-y-3">
+          <!-- Solution Illumination Bar -->
+          <div>
+            <div class="flex justify-between text-xs font-mono-code mb-1">
+              <span class="text-slate-300 font-semibold">Solution Illumination (Drug Found):</span>
+              <span id="label-illumination" class="font-bold text-rose-400">0.8% (Extremely Dim)</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-700">
+              <div id="bar-illumination" class="h-full rounded-full bg-rose-500 transition-all duration-100" style="width: 2%;"></div>
+            </div>
+          </div>
+
+          <!-- Search Time Required -->
+          <div class="grid grid-cols-2 gap-2 pt-2">
+            <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+              <span class="text-[10px] font-mono-code uppercase text-slate-400 block">Time to Solution</span>
+              <span id="val-time-estimate" class="text-sm font-mono-code font-bold text-rose-400">~10,000 Years</span>
+            </div>
+            <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+              <span class="text-[10px] font-mono-code uppercase text-slate-400 block">Tested simultaneously</span>
+              <span id="val-simultaneous" class="text-sm font-mono-code font-bold text-slate-300">1 of 10,000,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button: Randomize Drug Target -->
+      <button id="btn-relocate-target" class="w-full py-3 px-4 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center gap-2 transition active:scale-[0.99]">
+        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Randomize Target Virus Protein Binding Site
+      </button>
+
+      <!-- Explanation Box -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 leading-relaxed">
+        <p><strong class="text-rose-400">Classical Laser Mode:</strong> Like hunting for a needle with a narrow red pointer. It checks only one candidate at a time; the true cure stays completely dark until hit by random luck.</p>
+        <p class="mt-2"><strong class="text-cyan-400">Quantum Flashlight Mode:</strong> A wide wave floods all 10,000,000 shapes simultaneously. Wave physics dims wrong matches while lighting the true drug lock with brilliant radiance!</p>
+      </div>
+
+    </div>
+
+    <!-- Right Live Canvas Visualization (7 Cols) -->
+    <div class="lg:col-span-7 flex flex-col gap-4">
+
+      <!-- Preview Window -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+        
+        <!-- Window Titlebar -->
+        <div class="px-4 py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span id="pulse-dot" class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+            <span class="text-xs font-mono-code font-bold uppercase tracking-wider text-slate-200">Molecular State Preview Space</span>
+          </div>
+          <div class="text-[11px] font-mono-code text-slate-400 flex items-center gap-2">
+            <span>Interactive: Click or drag on space</span>
+          </div>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="relative w-full aspect-[16/12] bg-slate-950 overflow-hidden">
+          <canvas id="previewCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+
+          <!-- Floating HUD Labels inside Canvas -->
+          <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/60 pointer-events-none">
+            <div class="text-[10px] font-mono-code uppercase text-slate-400">Target Viral Receptor</div>
+            <div id="target-coordinates" class="text-xs font-mono-code font-bold text-amber-300">Lock: Active (Hidden)</div>
+          </div>
+
+          <!-- Target Solution Glow Badge -->
+          <div id="solution-indicator-card" class="absolute bottom-3 right-3 bg-slate-900/90 backdrop-blur-md p-3 rounded-xl border border-slate-700 shadow-xl pointer-events-none flex items-center gap-3 transition-opacity duration-300 opacity-60">
+            <div id="solution-glow-icon" class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </div>
+            <div>
+              <div class="text-[10px] font-mono-code uppercase text-slate-400">Target Drug Match</div>
+              <div id="solution-status-text" class="text-xs font-mono-code font-bold text-slate-400">Dim & Undetected</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Real-Time Metrics Strip -->
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-slate-900/70 border border-slate-800 rounded-xl p-3">
+          <div class="text-[10px] uppercase font-mono-code text-slate-400 mb-1">Illumination Mode</div>
+          <div class="text-sm font-mono-code font-bold text-rose-400" id="badge-mode-text">Narrow Laser</div>
+        </div>
+        <div class="bg-slate-900/70 border border-slate-800 rounded-xl p-3">
+          <div class="text-[10px] uppercase font-mono-code text-slate-400 mb-1">Target Brightness</div>
+          <div class="text-sm font-mono-code font-bold text-slate-400" id="metric-brightness">1% (Dim)</div>
+        </div>
+        <div class="bg-slate-900/70 border border-slate-800 rounded-xl p-3">
+          <div class="text-[10px] uppercase font-mono-code text-slate-400 mb-1">Destructive Gain</div>
+          <div class="text-sm font-mono-code font-bold text-amber-400" id="metric-filter">10% Active</div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Simulation Logic -->
+  <script>
+    // State variables
+    let modeValue = 0; // 0 = Pure Laser, 100 = Full Quantum Flashlight
+    let interferenceValue = 10;
+    let targetX = 0.72; // Normalized coordinates (0.0 - 1.0)
+    let targetY = 0.38;
+    let laserScanX = 0.1;
+    let laserScanY = 0.1;
+    let laserScanSpeed = 0.003;
+
+    // DOM References
+    const sliderMode = document.getElementById('slider-mode');
+    const valMode = document.getElementById('val-mode');
+    const badgeMode = document.getElementById('badge-mode');
+    const sliderInterference = document.getElementById('slider-interference');
+    const valInterference = document.getElementById('val-interference');
+
+    const labelIllumination = document.getElementById('label-illumination');
+    const barIllumination = document.getElementById('bar-illumination');
+    const valTimeEstimate = document.getElementById('val-time-estimate');
+    const valSimultaneous = document.getElementById('val-simultaneous');
+
+    const btnModeLaser = document.getElementById('btn-mode-laser');
+    const btnModeQuantum = document.getElementById('btn-mode-quantum');
+    const btnRelocateTarget = document.getElementById('btn-relocate-target');
+
+    const canvas = document.getElementById('previewCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = 0;
+    let height = 0;
+
+    const pulseDot = document.getElementById('pulse-dot');
+    const badgeModeText = document.getElementById('badge-mode-text');
+    const metricBrightness = document.getElementById('metric-brightness');
+    const metricFilter = document.getElementById('metric-filter');
+    const solutionIndicatorCard = document.getElementById('solution-indicator-card');
+    const solutionStatusText = document.getElementById('solution-status-text');
+    const solutionGlowIcon = document.getElementById('solution-glow-icon');
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      width = rect.width;
+      height = rect.height;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    // Grid of candidate molecules on the wall
+    const molecules = [];
+    const GRID_COLS = 24;
+    const GRID_ROWS = 18;
+
+    for (let r = 0; r < GRID_ROWS; r++) {
+      for (let c = 0; c < GRID_COLS; c++) {
+        molecules.push({
+          u: (c + 0.5) / GRID_COLS,
+          v: (r + 0.5) / GRID_ROWS,
+          phase: Math.random() * Math.PI * 2,
+          radius: 2 + Math.random() * 2
+        });
+      }
+    }
+
+    // Input Listeners
+    sliderMode.addEventListener('input', () => {
+      modeValue = parseFloat(sliderMode.value);
+      updateTelemetry();
+    });
+
+    sliderInterference.addEventListener('input', () => {
+      interferenceValue = parseFloat(sliderInterference.value);
+      updateTelemetry();
+    });
+
+    btnModeLaser.addEventListener('click', () => {
+      sliderMode.value = 0;
+      sliderInterference.value = 10;
+      modeValue = 0;
+      interferenceValue = 10;
+      updateTelemetry();
+    });
+
+    btnModeQuantum.addEventListener('click', () => {
+      sliderMode.value = 100;
+      sliderInterference.value = 95;
+      modeValue = 100;
+      interferenceValue = 95;
+      updateTelemetry();
+    });
+
+    btnRelocateTarget.addEventListener('click', () => {
+      targetX = 0.2 + Math.random() * 0.6;
+      targetY = 0.2 + Math.random() * 0.6;
+    });
+
+    // Allow user to click directly on canvas to reposition target
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      targetX = (e.clientX - rect.left) / width;
+      targetY = (e.clientY - rect.top) / height;
+    });
+
+    function updateTelemetry() {
+      const isQuantum = modeValue > 50;
+      const ratio = modeValue / 100;
+      const filterRatio = interferenceValue / 100;
+
+      // Update Sliders visual feedback
+      valMode.textContent = ratio < 0.1 
+        ? '0% (Pinpoint Laser)' 
+        : (ratio > 0.9 ? '100% (Full Flashlight Wave)' : `${Math.round(ratio * 100)}% (Spreading Beam)`);
+
+      valInterference.textContent = `${Math.round(filterRatio * 100)}%`;
+      metricFilter.textContent = `${Math.round(filterRatio * 100)}% Active`;
+
+      if (ratio < 0.2) {
+        sliderMode.className = 'w-full laser-thumb';
+        badgeMode.textContent = 'Classical Laser (Serial)';
+        badgeMode.className = 'text-xs px-2.5 py-1 rounded-full font-mono-code font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30';
+        badgeModeText.textContent = 'Narrow Laser';
+        badgeModeText.className = 'text-sm font-mono-code font-bold text-rose-400';
+        pulseDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping';
+      } else if (ratio > 0.8) {
+        sliderMode.className = 'w-full quantum-thumb';
+        badgeMode.textContent = 'Quantum Flashlight (Parallel)';
+        badgeMode.className = 'text-xs px-2.5 py-1 rounded-full font-mono-code font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/40';
+        badgeModeText.textContent = 'Quantum Wave';
+        badgeModeText.className = 'text-sm font-mono-code font-bold text-cyan-400';
+        pulseDot.className = 'w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse';
+      } else {
+        sliderMode.className = 'w-full';
+        badgeMode.textContent = 'Hybrid Superposition';
+        badgeMode.className = 'text-xs px-2.5 py-1 rounded-full font-mono-code font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30';
+        badgeModeText.textContent = 'Spreading Beam';
+        badgeModeText.className = 'text-sm font-mono-code font-bold text-amber-400';
+        pulseDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping';
+      }
+
+      // Compute Illumination and Time metrics
+      // In laser mode, illumination is low unless the laser is right over it
+      const baseIllum = Math.pow(ratio, 1.4) * (0.3 + 0.7 * filterRatio);
+      const totalIllumPct = Math.min(100, Math.max(1, baseIllum * 100));
+
+      labelIllumination.textContent = ratio > 0.75 
+        ? `${totalIllumPct.toFixed(1)}% (Blazing Solution!)` 
+        : `${totalIllumPct.toFixed(1)}% (Extremely Dim)`;
+
+      barIllumination.style.width = `${totalIllumPct}%`;
+      
+      if (ratio > 0.75) {
+        labelIllumination.className = 'font-bold text-cyan-300 font-mono-code';
+        barIllumination.className = 'h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 shadow-lg shadow-cyan-500/50';
+        valTimeEstimate.textContent = '< 4.2 Minutes';
+        valTimeEstimate.className = 'text-sm font-mono-code font-bold text-emerald-400';
+        valSimultaneous.textContent = '10,000,000 of 10M (100%)';
+        metricBrightness.textContent = `${totalIllumPct.toFixed(0)}% (Radiant)`;
+        metricBrightness.className = 'text-sm font-mono-code font-bold text-cyan-300';
+        
+        solutionIndicatorCard.style.opacity = '1';
+        solutionStatusText.textContent = 'Identified & Locked';
+        solutionStatusText.className = 'text-xs font-mono-code font-bold text-cyan-300';
+        solutionGlowIcon.className = 'w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center border border-cyan-500/40 shadow-lg shadow-cyan-500/40';
+      } else {
+        labelIllumination.className = 'font-bold text-rose-400 font-mono-code';
+        barIllumination.className = 'h-full rounded-full bg-rose-500';
+        valTimeEstimate.textContent = '~10,000 Years';
+        valTimeEstimate.className = 'text-sm font-mono-code font-bold text-rose-400';
+        valSimultaneous.textContent = '1 of 10,000,000 (Serial)';
+        metricBrightness.textContent = `${totalIllumPct.toFixed(1)}% (Dim)`;
+        metricBrightness.className = 'text-sm font-mono-code font-bold text-slate-400';
+
+        solutionIndicatorCard.style.opacity = '0.5';
+        solutionStatusText.textContent = 'Dim & Undetected';
+        solutionStatusText.className = 'text-xs font-mono-code font-bold text-slate-400';
+        solutionGlowIcon.className = 'w-8 h-8 rounded-lg bg-slate-800 text-slate-500 flex items-center justify-center';
+      }
+    }
+
+    // Initialize telemetry
+    updateTelemetry();
+
+    // Render Animation Loop
+    let lastTime = performance.now();
+
+    function render(currentTime) {
+      const dt = (currentTime - lastTime) / 1000;
+      lastTime = currentTime;
+
+      // Update Laser Scanner movement in classical mode
+      laserScanX += laserScanSpeed;
+      if (laserScanX > 0.95) {
+        laserScanX = 0.05;
+        laserScanY += 0.08;
+        if (laserScanY > 0.95) laserScanY = 0.05;
+      }
+
+      // Clear Canvas
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 0, width, height);
+
+      const ratio = modeValue / 100;
+      const filterRatio = interferenceValue / 100;
+      const sourceX = width * 0.08;
+      const sourceY = height * 0.5;
+
+      const tTargetPxX = targetX * width;
+      const tTargetPxY = targetY * height;
+
+      // Distance from classical laser to target
+      const laserCurrentPxX = laserScanX * width;
+      const laserCurrentPxY = laserScanY * height;
+      const distLaserToTarget = Math.hypot(laserCurrentPxX - tTargetPxX, laserCurrentPxY - tTargetPxY);
+      const isLaserHittingTarget = distLaserToTarget < 25;
+
+      // 1. Draw Background Molecule Field (Potential Drug Configurations)
+      molecules.forEach(mol => {
+        const px = mol.u * width;
+        const py = mol.v * height;
+
+        // Check if illuminated by beam or wave
+        let brightness = 0.06; // Baseline dark room
+        
+        // Quantum flashlight illumination
+        if (ratio > 0.01) {
+          const waveSpreadDist = Math.hypot(px - sourceX, py - sourceY);
+          const spreadAngle = Math.atan2(py - sourceY, px - sourceX);
+          const maxSpread = 0.2 + ratio * 1.2; // Beam angle opens up
+          
+          if (Math.abs(spreadAngle) < maxSpread) {
+            // In quantum beam
+            const interferenceDarken = (1 - filterRatio * 0.85); // Destructive filter cancels wrong answers
+            brightness += ratio * 0.35 * interferenceDarken;
+          }
+        }
+
+        // Classical laser spot illumination
+        if (ratio < 0.9) {
+          const distLaser = Math.hypot(px - laserCurrentPxX, py - laserCurrentPxY);
+          if (distLaser < 30) {
+            brightness += (1 - ratio) * (1 - distLaser / 30) * 0.9;
+          }
+        }
+
+        ctx.fillStyle = `rgba(148, 163, 184, ${brightness})`;
+        ctx.beginPath();
+        ctx.arc(px, py, mol.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 2. Draw Beam Propagation (Laser or Spreading Flashlight Wave)
+      ctx.save();
+      if (ratio < 0.5) {
+        // --- CLASSICAL LASER POINTER BEAM ---
+        const laserStrength = (1 - ratio * 1.5);
+        
+        // Red Laser Line
+        ctx.strokeStyle = `rgba(244, 63, 94, ${0.4 * laserStrength})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(sourceX, sourceY);
+        ctx.lineTo(laserCurrentPxX, laserCurrentPxY);
+        ctx.stroke();
+
+        // Laser Core Bright Dot
+        ctx.fillStyle = '#f43f5e';
+        ctx.shadowColor = '#f43f5e';
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.arc(laserCurrentPxX, laserCurrentPxY, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Little scan crosshair
+        ctx.strokeStyle = 'rgba(251, 113, 133, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(laserCurrentPxX, laserCurrentPxY, 12, 0, Math.PI * 2);
+        ctx.stroke();
+
+      } 
+      
+      if (ratio > 0.05) {
+        // --- QUANTUM FLASHLIGHT SPREADING CONE & RIPPLES ---
+        const coneAngle = 0.25 + ratio * 1.05; // Spreads from narrow to 180 degrees
+        const coneLength = width * 1.1;
+
+        // Gradient Flashlight Cone
+        const coneGrad = ctx.createRadialGradient(sourceX, sourceY, 10, sourceX, sourceY, coneLength);
+        coneGrad.addColorStop(0, `rgba(6, 182, 212, ${0.45 * ratio})`);
+        coneGrad.addColorStop(0.4, `rgba(14, 165, 233, ${0.2 * ratio})`);
+        coneGrad.addColorStop(1, 'rgba(2, 6, 23, 0)');
+
+        ctx.fillStyle = coneGrad;
+        ctx.beginPath();
+        ctx.moveTo(sourceX, sourceY);
+        ctx.arc(sourceX, sourceY, coneLength, -coneAngle, coneAngle);
+        ctx.closePath();
+        ctx.fill();
+
+        // Quantum Wavefront Ripples (Traveling forward like ripples in a pond)
+        const waveSpeed = 80;
+        const waveCount = 5;
+        ctx.strokeStyle = `rgba(56, 189, 248, ${0.25 * ratio})`;
+        ctx.lineWidth = 2;
+
+        for (let i = 0; i < waveCount; i++) {
+          const waveRadius = ((currentTime * (waveSpeed / 1000) + i * (coneLength / waveCount)) % coneLength);
+          ctx.beginPath();
+          ctx.arc(sourceX, sourceY, waveRadius, -coneAngle, coneAngle);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+
+      // 3. Draw The Target Viral Protein Solution ("The Lock")
+      ctx.save();
+      // Calculate final target brightness
+      let targetBrightness = 0.05; // Dim by default
+
+      if (ratio > 0.05) {
+        // Quantum Flashlight provides massive constructive interference amplification
+        targetBrightness += Math.pow(ratio, 1.2) * (0.3 + 0.7 * filterRatio);
+      }
+      
+      if (isLaserHittingTarget) {
+        // Momentary flash if laser happens to hit
+        targetBrightness = Math.max(targetBrightness, 0.95);
+      }
+
+      const targetGlowRadius = 15 + targetBrightness * 45;
+
+      // Outer Radiant Halo
+      const targetGlow = ctx.createRadialGradient(tTargetPxX, tTargetPxY, 2, tTargetPxX, tTargetPxY, targetGlowRadius);
+      
+      if (ratio > 0.6) {
+        // Quantum Cyan / Emerald Radiance
+        targetGlow.addColorStop(0, `rgba(52, 211, 153, ${0.9 * targetBrightness})`);
+        targetGlow.addColorStop(0.3, `rgba(6, 182, 212, ${0.6 * targetBrightness})`);
+        targetGlow.addColorStop(1, 'rgba(6, 182, 212, 0)');
+      } else {
+        // Classical Dim Red
+        targetGlow.addColorStop(0, `rgba(244, 63, 94, ${0.8 * targetBrightness})`);
+        targetGlow.addColorStop(0.5, `rgba(244, 63, 94, ${0.3 * targetBrightness})`);
+        targetGlow.addColorStop(1, 'rgba(244, 63, 94, 0)');
+      }
+
+      ctx.fillStyle = targetGlow;
+      ctx.beginPath();
+      ctx.arc(tTargetPxX, tTargetPxY, targetGlowRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Target Protein Lock Core Symbol
+      ctx.strokeStyle = ratio > 0.6 ? '#34d399' : '#f43f5e';
+      ctx.lineWidth = 2 + targetBrightness * 2;
+      ctx.shadowColor = ratio > 0.6 ? '#06b6d4' : '#f43f5e';
+      ctx.shadowBlur = targetBrightness * 25;
+
+      // Draw Keyhole / Protein Receptor Target Icon
+      ctx.beginPath();
+      ctx.arc(tTargetPxX, tTargetPxY, 10 + targetBrightness * 4, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(tTargetPxX, tTargetPxY, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Text Tag Floating near target
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillStyle = ratio > 0.6 ? '#6ee7b7' : '#94a3b8';
+      ctx.shadowBlur = 0;
+      ctx.fillText(`Target Receptor (${Math.round(targetBrightness * 100)}% Bright)`, tTargetPxX + 16, tTargetPxY + 4);
+      ctx.restore();
+
+      // 4. Draw Flashlight / Emitter Source Icon on the Left
+      ctx.save();
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = ratio > 0.5 ? '#06b6d4' : '#f43f5e';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(sourceX, sourceY, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = ratio > 0.5 ? '#38bdf8' : '#fb7185';
+      ctx.beginPath();
+      ctx.arc(sourceX, sourceY, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      requestAnimationFrame(render);
+    }
+
+    // Initialize Canvas on page load
+    window.addEventListener('load', () => {
+      resizeCanvas();
+      requestAnimationFrame(render);
+    });
+  </script>
+</body>
+</html>
